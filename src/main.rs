@@ -1,5 +1,8 @@
-use cairo::{FontSlant, FontWeight};
+use std::fs::File;
+
+use cairo::{FontSlant, FontWeight, Format, ImageSurface};
 use gtk::{
+    pango::Context,
     prelude::{ApplicationExt, ApplicationExtManual, DrawingAreaExtManual},
     traits::GtkWindowExt,
     Application, DrawingArea, Window,
@@ -41,4 +44,25 @@ fn build_ui(app: &Application) {
         .child(&drawing)
         .build();
     window.present();
+}
+
+fn stanalone() {
+    let surface = ImageSurface::create(Format::Rgb24, 512, 512).unwrap();
+    let cr = cairo::Context::new(&surface).unwrap();
+    cr.set_source_rgb(1.0, 1.0, 1.0);
+    cr.paint().unwrap();
+
+    cr.set_source_rgb(0.0, 0.0, 0.0);
+    cr.select_font_face("Fira Code", FontSlant::Normal, FontWeight::Normal);
+    cr.set_font_size(100.0);
+    cr.move_to(50.0, 225.0);
+    cr.show_text(".Hello").unwrap();
+
+    cr.set_source_rgb(100.0, 0.0, 100.0);
+    cr.select_font_face("Fira Code", FontSlant::Normal, FontWeight::Normal);
+    cr.set_font_size(100.0);
+    cr.move_to(100.0, 250.0);
+    cr.show_text(".Void").unwrap();
+    let mut file = File::create("example.png").unwrap();
+    surface.write_to_png(&mut file).unwrap();
 }
